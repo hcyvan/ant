@@ -1,5 +1,5 @@
 CC=g++49 -Wall -std=c++11
-OBJECTS=main.o lib.o connect.o
+OBJECTS=main.o lib.o tcp.o http.o
 ant:$(OBJECTS)
 	$(CC) $(OBJECTS) -o ant
 main.o:main.cc
