@@ -5,9 +5,9 @@
 #define RECV_BUF 10000
 using namespace std;
 
-class HttpRequest:private Connect{
+class HttpRequest:private HttpConnect{
 public:
-	HttpRequest(const Connect&);
+	HttpRequest(const HttpConnect&);
 	// GET (http request)
 protected:
 	int get();
@@ -59,5 +59,41 @@ public:
 private:
 	string respcontent;
 };
+
+/******************************************************
+ ****************** HttpUrl **************************
+ ****************************************************/
+class HttpUrl{
+public:
+	HttpUrl(const string& url);
+	const string& getHostName()const;
+	int getPort()const;
+	const string& getPath()const;
+	
+private:
+	string host_name;
+	int port;
+	string path;
+};
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #endif

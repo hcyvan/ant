@@ -4,14 +4,14 @@
 using namespace std;
 
 
-class Connect{
+class HttpConnect{
 public:
 	/** Use socket() to get a file discriptor.
 		Set the remote host address. **/
-	Connect(const string& ip, int objport=80);
-	Connect(const Connect &conn):fd(conn.fd),ip4(conn.ip4),port(conn.port), \
+	HttpConnect(const string& ip, int objport=80);
+	HttpConnect(const HttpConnect &conn):fd(conn.fd),ip4(conn.ip4),port(conn.port), \
 								timeout(conn.timeout){}
-	~Connect();
+	~HttpConnect();
 	/** Set the handshake time. SO_SNDTIMEO **/
 	void settimeout(int sec,int usec=0);
 protected:

@@ -10,7 +10,7 @@ void* checked_malloc(int n)
 	}
 	return p;
 }
-void errorExit(char* s)
+void errorExit(const char* s)
 {
 	perror(s);
 	exit(EXIT_FAILURE);

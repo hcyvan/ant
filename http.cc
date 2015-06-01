@@ -1,6 +1,6 @@
 #include "http.h"
 #include "lib.h"
-HttpRequest::HttpRequest(const Connect& conn):Connect(conn)
+HttpRequest::HttpRequest(const HttpConnect& conn):HttpConnect(conn)
 {
 	/** Three-way connect with the web server **/
 	handshake();	
@@ -121,6 +121,99 @@ void HttpRespContent::show() const
 
 
 
+/******************************************************
+ ****************** HttpUrl **************************
+ ****************************************************/
+HttpUrl::HttpUrl(const string& url)
+{
+	string::size_type http=url.find("http://");
+	string::size_type https=url.find("https://");
+	if(http==0){
+		string::size_type slash=url.find("/",7);
+		// http://www.baidu.com[:80]
+		if(slash==string::npos){
+			string::size_type colon=url.find(":",7);
+			// http://www.baidu.com
+			if(colon==string::npos){
+				host_name=url.substr(http);
+				port=80;
+			// http://www.baidu.com:80
+			}else{
+				host_name=url.substr(http,colon-http);
+				port=stoi(url.substr(colon+1));
+			}
+		// http://www.baidu.com[:80]/[index.html]
+		}else{
+			string::size_type colon=url.rfind(":",slash);
+			// http://www.baidu.com/[index.html]
+			if(colon==string::npos){
+				host_name=url.substr(http);
+				port=80;
+			// http://www.baidu.com:80/[index.html]
+			}else{
+				host_name=url.substr(http,colon-http);
+				port=stoi(url.substr(colon+1));
+			}
+			path=url.substr(slash);
+		}
+	}else if(https==0){
+		string::size_type slash=url.find("/",8);
+		// https://www.baidu.com[:80]
+		if(slash==string::npos){
+			string::size_type colon=url.find(":",8);
+			// https://www.baidu.com
+			if(colon==string::npos){
+				host_name=url.substr(http);
+				port=80;
+			// https://www.baidu.com:80
+			}else{
+				host_name=url.substr(http,colon-http);
+				port=stoi(url.substr(colon+1));
+			}
+		// https://www.baidu.com[:80]/[index.html]
+		}else{
+			string::size_type colon=url.rfind(":",slash);
+			// https://www.baidu.com/[index.html]
+			if(colon==string::npos){
+				host_name=url.substr(http);
+				port=80;
+			// https://www.baidu.com:80/[index.html]
+			}else{
+				host_name=url.substr(http,colon-http);
+				port=stoi(url.substr(colon+1));
+			}
+			path=url.substr(slash);
+		}
+	}else{
+		string wrong;
+		wrong=wrong + "\"" + url.c_str() + "\" is a wrong http URL.";
+		errorExit(wrong.c_str());
+	}
+}
+
+const string& HttpUrl::getHostName()const
+{
+	return host_name;
+}
+int  HttpUrl::getPort()const
+{
+	return port;
+}
+const string& HttpUrl::getPath()const
+{
+	return path;
+}
+	
+	
+
+
+
+
+
+			
+
+
+	
 
 
 

@@ -17,13 +17,14 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <netdb.h>
 using namespace std;
 // the function prototype decleared in <string.h>
 //extern char* strdup(char*);
 // if malloc() return NULL, call exit().
 void *checked_malloc(int);
 // perror() massage and eixt()
-void errorExit(char*);
+void errorExit(const char*);
 /** string split:
 	str: The string to be split.
 	vec: The container to put the splited string.

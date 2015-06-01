@@ -1,7 +1,7 @@
 #include "tcp.h"
 #include "lib.h"
 
-Connect::Connect(const string& ip, int objport):ip4(ip),port(objport)
+HttpConnect::HttpConnect(const string& ip, int objport):ip4(ip),port(objport)
 {
 	fd=socket(AF_INET, SOCK_STREAM, 0); 
 	if(fd==-1){
@@ -9,11 +9,11 @@ Connect::Connect(const string& ip, int objport):ip4(ip),port(objport)
 		errorExit(buf);
 	}
 }
-Connect::~Connect()
+HttpConnect::~HttpConnect()
 {
 	close(fd);
 }
-void Connect::handshake()
+void HttpConnect::handshake()
 {
 	// configure the sockaddr	
 	struct sockaddr_in address;
@@ -29,23 +29,23 @@ void Connect::handshake()
 	if(ret==-1){
 		char buf[30];
 		if(errno==EINPROGRESS){
-			sprintf(buf,"Connecting timeout: the limitation is %ds,%dms\n",\
+			sprintf(buf,"HttpConnecting timeout: the limitation is %ds,%dms\n",\
 					(int)timeout.tv_sec,(int)timeout.tv_usec);
 		}else{ 
 			sprintf(buf,"Can't connet with %s:%d \n",c_ip4,port);
 		}
-		errorExit(buf);
+		errorExit((const char*)buf);
 	}
 }
-int Connect::getfd()
+int HttpConnect::getfd()
 {
 	return fd;
 }
-const string& Connect::getip4()
+const string& HttpConnect::getip4()
 {
 	return ip4;
 }
-void Connect::settimeout(int sec,int usec)
+void HttpConnect::settimeout(int sec,int usec)
 {
 	timeout.tv_sec=sec;
 	timeout.tv_usec=usec;	
