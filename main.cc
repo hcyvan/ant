@@ -17,24 +17,8 @@ int main()
 
 	Connect skt(ip,port);
 	HttpRequest req(skt);
-	HttpResponeHead resp(req);
-
-	cout <<"*** "<<resp.find("Set-Cookie")<<endl;
-
-
+	HttpRespContent resp(req);
 	resp.show();
-
-//	int fd=skt.handshake();
-
-//	send(fd, request2, strlen(request2), 0); 
-
-/*
-while(1){
-		recv(fd,buf,sizeof(buf),0);
-		std::cout<< buf <<std::endl;
-	}
-*/	
-	
 	
 	return 0;
 }

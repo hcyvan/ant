@@ -47,46 +47,107 @@ int HttpRequest::head()
 }
 
 /******************************************************
- ************* HttpResponeHead ***********************
+ ************* HttpRespHead ***********************
  ****************************************************/
-HttpResponeHead::HttpResponeHead(const HttpRequest& req):HttpRequest(req)
+HttpRespHead::HttpRespHead(const HttpRequest& req):HttpRequest(req)
 {
-	char buf[RECV_HEAD_BUF];
+	char buf[RECV_BUF];
 	// send the HEAD http request
 	int fd=head();	
 	recv(fd, buf, sizeof(buf), 0);
-
-	const string headbuf(buf);
-	// split when \r\n
-	const string delim("\r\n");
-	vector<string> vec;
-	// split the response head content
-	split(headbuf, vec, delim);
-	// parse the response 
-	for(auto beg=vec.cbegin()+1;beg != vec.cend();++beg){
-		// split the string by ": " .
-		string colon(": ");
-		string::size_type num = beg->find(colon);
-		pair<string, string> key_value=make_pair(beg->substr(0,num),\
-										beg->substr(num+2));
-		// insert the pair to the map.
-		resp_key_value.insert(key_value);
+	resphead=buf;
+}
+const vector<string> HttpRespHead::find(const string& pattern) const
+{
+	vector<string> vec;	
+	string key(pattern);
+	key+=": ";
+	string::size_type begIdx=resphead.find(key);
+	while(begIdx != string::npos){		
+		begIdx=begIdx+key.length()-1;
+		string::size_type endIdx=resphead.find("\r\n",begIdx);
+		vec.push_back(resphead.substr(begIdx+1,endIdx-begIdx));
+	 	begIdx=resphead.find(key,endIdx);
 	}
-	respline=*vec.cbegin();
+	return vec;
 }
-const string& HttpResponeHead::find(const string& key) const
+const string& HttpRespHead::gethead(void)const
 {
-	auto value=resp_key_value.find(key);	
-	return value->second; 
-
+	return resphead;
 }
-
-void HttpResponeHead::show() const
+const string HttpRespHead::find_respline() const
 {
-	cout << respline <<endl;
-	for(auto i:resp_key_value)
-		cout << i.first << " => " << i.second << endl;
+	string::size_type endIdx=resphead.find("\r\n");
+	string respline=resphead.substr(0,endIdx);
+	return respline;
 }
+const string& HttpRespHead::data() const
+{
+	return resphead;
+}
+void HttpRespHead::show() const
+{
+	cout<<resphead<<endl;
+}
+
+/******************************************************
+ ************* HttpRespContent ***********************
+ ****************************************************/
+HttpRespContent::HttpRespContent(const HttpRequest& req):HttpRespHead(req)
+{
+	char buf[RECV_BUF];
+	// send the GET http request
+	int fd=get();	
+	
+	string::size_type data_len=stoi(*find("Content-Length").begin());
+	string::size_type head_len=gethead().length();
+	string::size_type total_len=data_len+head_len;
+	string::size_type len=0;
+	while(len<total_len){
+		memset(buf,'\0',RECV_BUF);	// Very! very! very! important
+		int recv_len=recv(fd, buf, RECV_BUF-1, 0);
+		len+=recv_len;
+		respcontent+=buf;
+	}
+}
+const string& HttpRespContent::data() const
+{
+	return respcontent;
+}
+void HttpRespContent::show() const
+{
+	cout<<respcontent<<endl;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
