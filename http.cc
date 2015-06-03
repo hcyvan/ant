@@ -129,10 +129,11 @@ HttpUrl::HttpUrl(const string& url)
 	string::size_type http=url.find("http://");
 	string::size_type https=url.find("https://");
 	if(http==0){
-		string::size_type slash=url.find("/",7);
+		http+=7;
+		string::size_type slash=url.find("/",http);
 		// http://www.baidu.com[:80]
 		if(slash==string::npos){
-			string::size_type colon=url.find(":",7);
+			string::size_type colon=url.find(":",http);
 			// http://www.baidu.com
 			if(colon==string::npos){
 				host_name=url.substr(http);
@@ -146,7 +147,8 @@ HttpUrl::HttpUrl(const string& url)
 		}else{
 			string::size_type colon=url.rfind(":",slash);
 			// http://www.baidu.com/[index.html]
-			if(colon==string::npos){
+			//if(colon==string::npos){
+			if(colon<http){
 				host_name=url.substr(http);
 				port=80;
 			// http://www.baidu.com:80/[index.html]
@@ -157,10 +159,11 @@ HttpUrl::HttpUrl(const string& url)
 			path=url.substr(slash);
 		}
 	}else if(https==0){
-		string::size_type slash=url.find("/",8);
+		https+=8;
+		string::size_type slash=url.find("/",https);
 		// https://www.baidu.com[:80]
 		if(slash==string::npos){
-			string::size_type colon=url.find(":",8);
+			string::size_type colon=url.find(":",https);
 			// https://www.baidu.com
 			if(colon==string::npos){
 				host_name=url.substr(http);
