@@ -31,9 +31,10 @@ int main()
 	for(auto i:l)
 		cout << i<< endl;
 ////////////////////////////////////////////////
-	const string name2("http://www.baidu.com/");
+	const string name2("http://www.baidu.com:");
 	HttpUrl url(name2);
 	cout << url.getHostName()<<endl;
+	cout << url.getPort()<<endl;
 	cout << url.getPath()<<endl;
 	
 	return 0;

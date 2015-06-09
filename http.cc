@@ -126,71 +126,26 @@ void HttpRespContent::show() const
  ****************************************************/
 HttpUrl::HttpUrl(const string& url)
 {
-	string::size_type http=url.find("http://");
-	string::size_type https=url.find("https://");
-	if(http==0){
-		http+=7;
-		string::size_type slash=url.find("/",http);
-		// http://www.baidu.com[:80]
-		if(slash==string::npos){
-			string::size_type colon=url.find(":",http);
-			// http://www.baidu.com
-			if(colon==string::npos){
-				host_name=url.substr(http);
-				port=80;
-			// http://www.baidu.com:80
-			}else{
-				host_name=url.substr(http,colon-http);
-				port=stoi(url.substr(colon+1));
-			}
-		// http://www.baidu.com[:80]/[index.html]
-		}else{
-			string::size_type colon=url.rfind(":",slash);
-			// http://www.baidu.com/[index.html]
-			//if(colon==string::npos){
-			if(colon<http){
-				host_name=url.substr(http);
-				port=80;
-			// http://www.baidu.com:80/[index.html]
-			}else{
-				host_name=url.substr(http,colon-http);
-				port=stoi(url.substr(colon+1));
-			}
-			path=url.substr(slash);
-		}
-	}else if(https==0){
-		https+=8;
-		string::size_type slash=url.find("/",https);
-		// https://www.baidu.com[:80]
-		if(slash==string::npos){
-			string::size_type colon=url.find(":",https);
-			// https://www.baidu.com
-			if(colon==string::npos){
-				host_name=url.substr(http);
-				port=80;
-			// https://www.baidu.com:80
-			}else{
-				host_name=url.substr(http,colon-http);
-				port=stoi(url.substr(colon+1));
-			}
-		// https://www.baidu.com[:80]/[index.html]
-		}else{
-			string::size_type colon=url.rfind(":",slash);
-			// https://www.baidu.com/[index.html]
-			if(colon==string::npos){
-				host_name=url.substr(http);
-				port=80;
-			// https://www.baidu.com:80/[index.html]
-			}else{
-				host_name=url.substr(http,colon-http);
-				port=stoi(url.substr(colon+1));
-			}
-			path=url.substr(slash);
-		}
+	regex httpUrl("^(http://|https://)?(([[:w:]]+\\.)+[[:w:]]+)(:([[:d:]]*))?(/.*)?");	
+	smatch m;
+	bool find=regex_match(url,m,httpUrl);
+	if(find==false){
+		string wrong("\""+url+"\" is a wrong http URL.");
+		errorExit(wrong);
+	}
+	// host_name
+	host_name=m.str(2);
+	// port
+	if(m.str(5).size()==0){
+		port=80;
 	}else{
-		string wrong;
-		wrong=wrong + "\"" + url.c_str() + "\" is a wrong http URL.";
-		errorExit(wrong.c_str());
+		port=stoi(m.str(5));
+	}
+	// path
+	if(m.str(6).size()==0){
+		path="/index.html";
+	}else{
+		path=m.str(6);
 	}
 }
 
@@ -198,10 +153,12 @@ const string& HttpUrl::getHostName()const
 {
 	return host_name;
 }
+
 int  HttpUrl::getPort()const
 {
 	return port;
 }
+
 const string& HttpUrl::getPath()const
 {
 	return path;

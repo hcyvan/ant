@@ -15,6 +15,11 @@ void errorExit(const char* s)
 	perror(s);
 	exit(EXIT_FAILURE);
 }
+void errorExit(const string s)
+{
+	perror(s.c_str());
+	exit(EXIT_FAILURE);
+}
 
 int split(const string& str,vector<string> & vec, const string& delims)
 {

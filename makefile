@@ -1,4 +1,4 @@
-CC=g++49 -Wall -std=c++11
+CC=g++ -Wall -std=c++11
 OBJECTS=main.o lib.o tcp.o http.o dns.o
 ant:$(OBJECTS)
 	$(CC) $(OBJECTS) -o ant

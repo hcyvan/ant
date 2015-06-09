@@ -4,13 +4,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+
 #include <unordered_map>
 #include <map>
 #include <utility>
-
 #include <string>
 #include <vector>
 #include <iostream>
+#include <regex>
 
 #include <sys/time.h>
 #include <sys/types.h>
@@ -25,6 +26,7 @@ using namespace std;
 void *checked_malloc(int);
 // perror() massage and eixt()
 void errorExit(const char*);
+void errorExit(const string);
 /** string split:
 	str: The string to be split.
 	vec: The container to put the splited string.
