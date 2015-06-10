@@ -8,32 +8,38 @@ Dns::Dns(const string& hostname)
 		switch(h_errno){
 			case HOST_NOT_FOUND:
 				wrong=wrong+hostname.c_str()+" is unknown. ";
-				errorExit(wrong.c_str());
+				errorExit(wrong);
 				break;
 			case NO_ADDRESS:
 				wrong=wrong+hostname.c_str()+" is valid, but does not have IP address. ";
-				errorExit(wrong.c_str());
+				errorExit(wrong);
 				break;
 			case NO_RECOVERY:
 				wrong=wrong+hostname.c_str()+" Nonrecoverable name server error occurred. ";
-				errorExit(wrong.c_str());
+				errorExit(wrong);
 				break;
 			case TRY_AGAIN:
 				wrong=wrong+hostname.c_str()+" Try Again later. ";
-				errorExit(wrong.c_str());
+				errorExit(wrong);
 				break;
 			default:
 				wrong=wrong+hostname.c_str()+" Unkown reasion";
-				errorExit(wrong.c_str());
+				errorExit(wrong);
 				break;
 		}
 	}
+	host_name=hostname;
 	for(char** s=dns->h_addr_list;*s!=nullptr;++s){
 		char*str=inet_ntoa(*(struct in_addr*)*s);
-		ip4_list.push_back(str);
+		ip4_vec.push_back(str);
 	}
 }
-const vector<string>& Dns::data()const
+const vector<string>& Dns::getIp4Vec()const
 {
-	return ip4_list;
+	return ip4_vec;
 }
+const string& Dns::getHostName()const
+{
+	return host_name;
+}
+

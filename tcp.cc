@@ -5,7 +5,7 @@ HttpConnect::HttpConnect(const string& ip, int objport):ip4(ip),port(objport)
 {
 	fd=socket(AF_INET, SOCK_STREAM, 0); 
 	if(fd==-1){
-		char buf[]="Can return valuable socket";
+		char buf[]="Can't return valuable socket";
 		errorExit(buf);
 	}
 }
@@ -45,7 +45,7 @@ const string& HttpConnect::getip4()
 {
 	return ip4;
 }
-void HttpConnect::settimeout(int sec,int usec)
+void HttpConnect::setTimeout(int sec,int usec)
 {
 	timeout.tv_sec=sec;
 	timeout.tv_usec=usec;	

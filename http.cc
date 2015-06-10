@@ -1,20 +1,83 @@
 #include "http.h"
 #include "lib.h"
+/******************************************************
+ ****************** HttpUrl **************************
+ ****************************************************/
+HttpUrl::HttpUrl(const string& url)
+{
+	regex httpUrl("^(http://|https://)?(([[:w:]]+\\.)+[[:w:]]+)(:([[:d:]]*))?(/.*)?");	
+	smatch m;
+	bool find=regex_match(url,m,httpUrl);
+	if(find==false){
+		string wrong("\""+url+"\" is a wrong http URL.");
+		errorExit(wrong);
+	}
+	// host_name
+	host_name=m.str(2);
+	// port
+	if(m.str(5).size()==0){
+		port=80;
+	}else{
+		port=stoi(m.str(5));
+	}
+	// path
+	if(m.str(6).size()==0){
+		path="/";
+	}else{
+		path=m.str(6);
+	}
+}
+
+const string& HttpUrl::getHostName()const
+{
+	return host_name;
+}
+
+int  HttpUrl::getPort()const
+{
+	return port;
+}
+
+const string& HttpUrl::getPath()const
+{
+	return path;
+}
+/******************************************************
+ ****************** HttpRequest ***********************
+ ****************************************************/
 HttpRequest::HttpRequest(const HttpConnect& conn):HttpConnect(conn)
 {
 	/** Three-way connect with the web server **/
 	handshake();	
-	reqURI="/index.html";
+	reqPath="/index.html";
 	version="HTTP/1.1";
 	if(reqhead.empty()){
 		string host="HOST:"+ getip4();
 		reqhead.push_back(host);
 	}
 }
+HttpRequest::HttpRequest(const HttpConnect& conn, \
+			const string& path):HttpConnect(conn),reqPath(path)
+{
+	/** Three-way connect with the web server **/
+	handshake();	
+	version="HTTP/1.1";
+	if(reqhead.empty()){
+		string host="HOST:"+ getip4();
+		reqhead.push_back(host);
+	}
+}
+HttpRequest::HttpRequest(const HttpConnect& conn,\
+			const string& path,const vector<string>& reqhead \
+			):HttpConnect(conn),reqPath(path),reqhead(reqhead)
+{
+	handshake();	
+	version="HTTP/1.1";
+}
 int HttpRequest::get()
 {
 	// request line
-	string get="GET "+ reqURI + " " + version + "\n";
+	string get="GET "+ reqPath + " " + version + "\n";
 	// request head
 	for(auto &s : reqhead){
 		get=get+s+"\n";
@@ -31,7 +94,7 @@ int HttpRequest::get()
 int HttpRequest::head()
 {
 	// request line
-	string get="HEAD "+ reqURI + " " + version + "\n";
+	string get="HEAD "+ reqPath + " " + version + "\n";
 	// request head
 	for(auto &s : reqhead){
 		get=get+s+"\n";
@@ -93,21 +156,73 @@ void HttpRespHead::show() const
 /******************************************************
  ************* HttpRespContent ***********************
  ****************************************************/
-HttpRespContent::HttpRespContent(const HttpRequest& req):HttpRespHead(req)
+HttpRespContent::HttpRespContent(const HttpRequest& req):HttpRequest(req)
 {
 	char buf[RECV_BUF];
 	// send the GET http request
 	int fd=get();	
-	
-	string::size_type data_len=stoi(*find("Content-Length").begin());
-	string::size_type head_len=gethead().length();
-	string::size_type total_len=data_len+head_len;
-	string::size_type len=0;
-	while(len<total_len){
-		memset(buf,'\0',RECV_BUF);	// Very! very! very! important
-		int recv_len=recv(fd, buf, RECV_BUF-1, 0);
-		len+=recv_len;
+	string::size_type header_end;
+	unsigned int content_length=-1;
+	int chunk=-1;
+	for(;;){
+		memset(buf,'\0',RECV_BUF);	// Very!very!very!important
+		recv(fd, buf, RECV_BUF-1, 0);
 		respcontent+=buf;
+		auto length=respcontent.find("Content-Length:");
+		auto chunked=respcontent.find("chunked\r\n");
+		if(length!=string::npos){
+			length=respcontent.find_first_of("0123456789",length);
+			content_length=stoul(respcontent.substr(length));
+		}
+		if(chunked!=string::npos){
+			chunk=0;
+		}
+		header_end=respcontent.find("\r\n\r\n");
+		if(header_end!=string::npos){
+			break;
+		}
+	}
+	if(content_length!=(unsigned int)-1){
+		string::size_type head_length=header_end+4;
+		while(respcontent.size()<head_length+content_length){
+			memset(buf,'\0',RECV_BUF);
+			recv(fd, buf, RECV_BUF-1, 0);
+			respcontent+=buf;
+		}
+	}else if(chunk!=-1){
+		unsigned int chunk_size=stoi(respcontent.substr(header_end+4),nullptr,16);
+		string::size_type chunk_beg=respcontent.find("\r\n",header_end+4)+2;
+		unsigned int end=chunk_beg+chunk_size;
+
+		for(;;){
+			if(respcontent.size()>end+2){
+
+				if(respcontent.find("\r\n",end+2)!=string::npos){
+					chunk_size=stoi(respcontent.substr(end),nullptr,16);
+					if(chunk_size==0){
+						break;
+					}else{
+						chunk_beg=respcontent.find("\r\n",end+2)+2;
+						end=chunk_beg+chunk_size;
+					}
+				}else{
+					recv(fd, buf, RECV_BUF-1, 0);
+					respcontent+=buf;
+					chunk_size=stoi(respcontent.substr(end),nullptr,16);
+					if(chunk_size==0){
+						break;
+					}else{
+						chunk_beg=respcontent.find("\r\n",end+2)+2;
+						end=chunk_beg+chunk_size;
+					}
+				}
+			}		
+			memset(buf,'\0',RECV_BUF);	// Very!very!very!important
+			recv(fd, buf, RECV_BUF-1, 0);
+			respcontent+=buf;
+		}
+	}else{
+		errorExit("Can't ensure the length of the http response.");
 	}
 }
 const string& HttpRespContent::data() const
@@ -121,97 +236,5 @@ void HttpRespContent::show() const
 
 
 
-/******************************************************
- ****************** HttpUrl **************************
- ****************************************************/
-HttpUrl::HttpUrl(const string& url)
-{
-	regex httpUrl("^(http://|https://)?(([[:w:]]+\\.)+[[:w:]]+)(:([[:d:]]*))?(/.*)?");	
-	smatch m;
-	bool find=regex_match(url,m,httpUrl);
-	if(find==false){
-		string wrong("\""+url+"\" is a wrong http URL.");
-		errorExit(wrong);
-	}
-	// host_name
-	host_name=m.str(2);
-	// port
-	if(m.str(5).size()==0){
-		port=80;
-	}else{
-		port=stoi(m.str(5));
-	}
-	// path
-	if(m.str(6).size()==0){
-		path="/index.html";
-	}else{
-		path=m.str(6);
-	}
-}
-
-const string& HttpUrl::getHostName()const
-{
-	return host_name;
-}
-
-int  HttpUrl::getPort()const
-{
-	return port;
-}
-
-const string& HttpUrl::getPath()const
-{
-	return path;
-}
 	
 	
-
-
-
-
-
-			
-
-
-	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
