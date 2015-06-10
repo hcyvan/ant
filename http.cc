@@ -22,7 +22,7 @@ HttpUrl::HttpUrl(const string& url)
 	}
 	// path
 	if(m.str(6).size()==0){
-		path="/index.html";
+		path="/";
 	}else{
 		path=m.str(6);
 	}
@@ -195,7 +195,6 @@ HttpRespContent::HttpRespContent(const HttpRequest& req):HttpRequest(req)
 		unsigned int end=chunk_beg+chunk_size;
 
 		for(;;){
-			cout<<respcontent.size()<<" "<<end<< endl;
 			if(respcontent.size()>end+2){
 
 				if(respcontent.find("\r\n",end+2)!=string::npos){
@@ -223,9 +222,8 @@ HttpRespContent::HttpRespContent(const HttpRequest& req):HttpRequest(req)
 			respcontent+=buf;
 		}
 	}else{
-		//do something
+		errorExit("Can't ensure the length of the http response.");
 	}
-	cout << respcontent <<endl;
 }
 const string& HttpRespContent::data() const
 {

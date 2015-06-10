@@ -1,5 +1,5 @@
 CC=g++ -Wall -std=c++11
-OBJECTS=main.o lib.o tcp.o http.o dns.o
+OBJECTS=main.o lib.o tcp.o http.o dns.o spider.o
 ant:$(OBJECTS)
 	$(CC) $(OBJECTS) -o ant
 main.o:main.cc
