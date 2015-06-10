@@ -4,10 +4,30 @@
 
 #define RECV_BUF 10000
 using namespace std;
+/******************************************************
+ ****************** HttpUrl **************************
+ ****************************************************/
+class HttpUrl{
+public:
+	HttpUrl(const string& url);
+	const string& getHostName()const;
+	int getPort()const;
+	const string& getPath()const;
+	
+private:
+	string host_name;
+	int port;
+	string path;
+};
 
+/******************************************************
+ ****************** HttpRequest ***********************
+ ****************************************************/
 class HttpRequest:private HttpConnect{
 public:
 	HttpRequest(const HttpConnect&);
+	HttpRequest(const HttpConnect&,const string&);
+	HttpRequest(const HttpConnect&,const string&,const vector<string>&);
 	// GET (http request)
 protected:
 	int get();
@@ -15,7 +35,7 @@ protected:
 	int head();
 private:
 	// Http request line;
-	string reqURI;
+	string reqPath;
 	string version;
 	// Http request head;
 	vector<string> reqhead;
@@ -49,7 +69,7 @@ private:
 /******************************************************
  ************* HttpResponeContent ***********************
  ****************************************************/
-class HttpRespContent:public HttpRespHead{
+class HttpRespContent:public HttpRequest{
 public:
 	HttpRespContent(const HttpRequest&);
 	/** Return the reference of respcontent **/
@@ -59,41 +79,5 @@ public:
 private:
 	string respcontent;
 };
-
-/******************************************************
- ****************** HttpUrl **************************
- ****************************************************/
-class HttpUrl{
-public:
-	HttpUrl(const string& url);
-	const string& getHostName()const;
-	int getPort()const;
-	const string& getPath()const;
-	
-private:
-	string host_name;
-	int port;
-	string path;
-};
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #endif

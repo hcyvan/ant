@@ -8,12 +8,13 @@ class HttpConnect{
 public:
 	/** Use socket() to get a file discriptor.
 		Set the remote host address. **/
+	HttpConnect()=default;
 	HttpConnect(const string& ip, int objport=80);
 	HttpConnect(const HttpConnect &conn):fd(conn.fd),ip4(conn.ip4),port(conn.port), \
 								timeout(conn.timeout){}
 	~HttpConnect();
 	/** Set the handshake time. SO_SNDTIMEO **/
-	void settimeout(int sec,int usec=0);
+	void setTimeout(int sec,int usec=0);
 protected:
 	/** Get the socket to connect with web server **/
 	int getfd(void);

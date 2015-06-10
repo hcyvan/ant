@@ -6,9 +6,11 @@ using namespace std;
 class Dns{
 public:
 	Dns(const string& hostname);
-	const vector<string>& data()const;
+	const vector<string>& getIp4Vec()const;
+	const string& getHostName()const;
 private:
-	vector<string> ip4_list;	
+	string host_name;
+	vector<string> ip4_vec;	
 };
 
 
