@@ -8,6 +8,7 @@ public:
 	Dns(const string& hostname);
 	const vector<string>& getIp4Vec()const;
 	const string& getHostName()const;
+	
 private:
 	string host_name;
 	vector<string> ip4_vec;	
