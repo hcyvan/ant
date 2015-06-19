@@ -69,7 +69,7 @@ private:
 /******************************************************
  ************* HttpRespContent ***********************
  ****************************************************/
-class HttpRespContent:public HttpRequest{
+class HttpRespContent:public HttpRequest{ 
 public:
 	HttpRespContent(const HttpRequest&);
 	/** Return the reference of respcontent **/

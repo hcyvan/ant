@@ -8,7 +8,7 @@ class HttpConnect{
 public:
 	/** Use socket() to get a file discriptor.
 		Set the remote host address. **/
-	HttpConnect()=default;
+	//HttpConnect()=default;
 	HttpConnect(const string& ip, int objport=80);
 	HttpConnect(const HttpConnect &conn):fd(conn.fd),ip4(conn.ip4),port(conn.port), \
 								timeout(conn.timeout){}
