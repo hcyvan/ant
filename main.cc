@@ -10,12 +10,15 @@
 
 int main()
 {
-	//const string name("www.126.com");
-	const string name("http://www.baidu.com");
+  //const string name("www.126.com");
+  const string name("http://www.baidu.com");
 
-	cout <<Spider::get(name)<<endl;
-
+  Spider a;
+  a.get(name);
+  a.get(name);
+  //  cout <<a.get()<<endl;
+  
 
 	
-	return 0;
+  return 0;
 }

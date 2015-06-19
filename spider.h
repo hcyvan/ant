@@ -5,10 +5,16 @@
 #include "http.h"
 #include "dns.h"
 using namespace std;
+
+
 class Spider{
 public:
-	static string get(const string&);
+  Spider();
+  string get(const string &);
 private:
+
+  const string url;
+	
 };
 
 
