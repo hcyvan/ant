@@ -12,11 +12,12 @@ int main()
 {
   //const string name("www.126.com");
   const string name("http://www.baidu.com");
+ //const string name("http://www.jumeiglobal.com/ajax_new/getDealsByPage?type=new&pagesize=20&index=10&page=index&callback=global_load_callback");
 
   Spider a;
-  a.get(name);
-  a.get(name);
-  //  cout <<a.get()<<endl;
+  
+ 
+  cout <<a.get(name)<<endl;
   
 
 	

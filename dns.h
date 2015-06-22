@@ -22,5 +22,5 @@ class DnsLocal{
  private:
   unordered_map<string,string> hostname_ip4_hash;
 };
-  
+
 #endif
