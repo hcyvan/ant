@@ -20,10 +20,11 @@ string Spider::get(const string& url)
   if(ip4==""){
     // cout << "use remote dns ..." <<endl;
     Dns dns;
+    //Dns::openTcp();
     ip4=dns.getHostByName(url_parser.getHostName()).getAddrList()[0];
     __local_dns->insert(url_parser.getHostName(),ip4);
   }//else{cout << ip4 <<endl;}
-
+  //Dns::closeTcp();
   // HttpConnect
   HttpConnect skt(ip4,url_parser.getPort());
   // HttpRequest

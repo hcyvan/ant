@@ -5,6 +5,13 @@ using namespace std;
 
 class Dns{
  public:
+  // Connect with name server use TCP socket. The
+  // default is UDP.
+  static void openTcp(void);
+  // Colse the TCP socket.
+  static void closeTcp(void);
+  // Get the host address and other information
+  // from the name server.
   Dns& getHostByName(const string&);
   const string getHostName(void)const;
   const int getAddrType(void)const;

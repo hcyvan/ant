@@ -39,9 +39,21 @@ const vector<string> Dns::getAddrList()const
 {
   return h_addr_list;
 }
+void Dns::openTcp(void)
+{
+  sethostent(1);
+  // cout << "open" << endl;
+}
+void Dns::closeTcp(void)
+{
+  endhostent();
+  // cout << "closed" <<endl;
+}
 
 void Dns::hErrno()const
 {
+  errorExit(hstrerror(h_errno));
+  /*
   string wrong("DNS Parse Wrong: ");
   switch(h_errno){
   case HOST_NOT_FOUND:
@@ -65,6 +77,7 @@ void Dns::hErrno()const
     errorExit(wrong);
     break;
   }
+  */
 }
 /**********************************************
  ************** DnsLocal **********************
