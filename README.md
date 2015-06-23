@@ -1,5 +1,6 @@
 ## Crawler
-This is a suite of APIs for web spider. These APIs are wirte by C++11 and use the linux socket APIs for the lower layer. The version 0.1 is relased. 0.1 means it is not stable and maybe contain a lot of bugs. When 1.0 is released, the APIs is OK to use. There are several modules in the APIs.
+This is a suite of APIs for web spider. These APIs are wirte by C++11 and use the linux socket APIs for the lower layer. The version 0.1 is relased. 0.1 means it is not stable and maybe contain a lot of bugs. When 1.0 is released, the APIs is OK to use. There are several modules in the APIs.  
+For more information, read the manual.md in chinese.
 ---
 ## Brief
 There are five moudle's in the API suite.
