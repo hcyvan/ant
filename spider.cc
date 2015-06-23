@@ -19,8 +19,8 @@ string Spider::get(const string& url)
   string ip4=__local_dns->find(url_parser.getHostName());
   if(ip4==""){
     // cout << "use remote dns ..." <<endl;
-    Dns dns(url_parser.getHostName());
-    ip4=dns.getIp4Vec()[0];
+    Dns dns;
+    ip4=dns.getHostByName(url_parser.getHostName()).getAddrList()[0];
     __local_dns->insert(url_parser.getHostName(),ip4);
   }//else{cout << ip4 <<endl;}
 

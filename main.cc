@@ -17,9 +17,7 @@ int main()
   Spider a;
   
  
-  cout <<a.get(name)<<endl;
-  
-
+    cout <<a.get(name)<<endl;
 	
   return 0;
 }

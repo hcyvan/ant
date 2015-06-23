@@ -1,48 +1,71 @@
 #include "lib.h"
 #include "dns.h"
-Dns::Dns(const string& hostname)
+/**********************************************
+ ****************** Dns **********************
+ *******************************************/
+Dns& Dns::getHostByName(const string& name)
 {
-  struct hostent* dns=gethostbyname(hostname.c_str());
-  if(!dns){
-    string wrong("DNS Parse Wrong: ");
-    switch(h_errno){
-    case HOST_NOT_FOUND:
-      wrong=wrong+hostname.c_str()+" is unknown. ";
-      errorExit(wrong);
-      break;
-    case NO_ADDRESS:
-      wrong=wrong+hostname.c_str()+" is valid, but does not have IP address. ";
-      errorExit(wrong);
-      break;
-    case NO_RECOVERY:
-      wrong=wrong+hostname.c_str()+" Nonrecoverable name server error occurred. ";
-      errorExit(wrong);
-      break;
-    case TRY_AGAIN:
-      wrong=wrong+hostname.c_str()+" Try Again later. ";
-      errorExit(wrong);
-      break;
-    default:
-      wrong=wrong+hostname.c_str()+" Unkown reasion";
-      errorExit(wrong);
-      break;
-    }
+  hostent_p=gethostbyname(name.c_str());
+  if(hostent_p==nullptr)
+    hErrno();
+  // official name of host
+  h_name=hostent_p->h_name;
+  // alias list
+  for(char** s=hostent_p->h_aliases;*s!=nullptr;++s){
+    h_aliases.push_back(*s);
   }
-  host_name=hostname;
-  for(char** s=dns->h_addr_list;*s!=nullptr;++s){
-    char*str=inet_ntoa(*(struct in_addr*)*s);
-    ip4_vec.push_back(str);
+  // host address type
+  h_addrtype=hostent_p->h_addrtype;
+  // list of addresses
+  for(char** s=hostent_p->h_addr_list;*s!=nullptr;++s){
+    h_addr_list.push_back(inet_ntoa(*(struct in_addr*)*s));
   }
+
+  return *this;
 }
-const vector<string>& Dns::getIp4Vec()const
+const string Dns::getHostName()const
 {
-  return ip4_vec;
+  return h_name;
 }
-const string& Dns::getHostName()const
+const int Dns::getAddrType()const
 {
-  return host_name;
+  return h_addrtype;
+}
+const vector<string> Dns::getAliases()const
+{
+  return h_aliases;
+}
+const vector<string> Dns::getAddrList()const
+{
+  return h_addr_list;
 }
 
+void Dns::hErrno()const
+{
+  string wrong("DNS Parse Wrong: ");
+  switch(h_errno){
+  case HOST_NOT_FOUND:
+    wrong=wrong+h_name.c_str()+" is unknown. ";
+    errorExit(wrong);
+    break;
+  case NO_ADDRESS:
+    wrong=wrong+h_name.c_str()+" is valid, but does not have IP address. ";
+    errorExit(wrong);
+    break;
+  case NO_RECOVERY:
+    wrong=wrong+h_name.c_str()+" Nonrecoverable name server error occurred. ";
+    errorExit(wrong);
+    break;
+  case TRY_AGAIN:
+    wrong=wrong+h_name.c_str()+" Try Again later. ";
+    errorExit(wrong);
+    break;
+  default:
+    wrong=wrong+h_name.c_str()+" Unkown reasion";
+    errorExit(wrong);
+    break;
+  }
+}
 /**********************************************
  ************** DnsLocal **********************
  *******************************************/

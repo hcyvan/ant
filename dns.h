@@ -5,13 +5,21 @@ using namespace std;
 
 class Dns{
  public:
-  Dns(const string& hostname);
-  const vector<string>& getIp4Vec()const;
-  const string& getHostName()const;
-	
+  Dns& getHostByName(const string&);
+  const string getHostName(void)const;
+  const int getAddrType(void)const;
+  const vector<string> getAliases(void)const;
+  const vector<string> getAddrList(void)const; 
  private:
-  string host_name;
-  vector<string> ip4_vec;	
+  void hErrno(void)const;
+
+  struct hostent* hostent_p;
+  string h_name;             // official name of host
+  vector<string> h_aliases;  // alias list
+  int h_addrtype;            // AF_INET/AF_INET6 
+  // int h_length;           // length of address
+  vector<string> h_addr_list;// list of addresses
+  
 };
 
 class DnsLocal{
