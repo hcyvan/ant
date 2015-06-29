@@ -5,103 +5,109 @@
  *******************************************/
 Dns& Dns::getHostByName(const string& name)
 {
-  hostent_p=gethostbyname(name.c_str());
-  if(hostent_p==nullptr)
-    hErrno();
-  // official name of host
-  h_name=hostent_p->h_name;
-  // alias list
-  for(char** s=hostent_p->h_aliases;*s!=nullptr;++s){
-    h_aliases.push_back(*s);
-  }
-  // host address type
-  h_addrtype=hostent_p->h_addrtype;
-  // list of addresses
-  for(char** s=hostent_p->h_addr_list;*s!=nullptr;++s){
-    h_addr_list.push_back(inet_ntoa(*(struct in_addr*)*s));
-  }
+        if(addrinfo_p!=NULL){
+                freeaddrinfo(addrinfo_p);
+                addrinfo_p=NULL;
+        }
+        hostent_p=gethostbyname(name.c_str());
+        if(hostent_p==nullptr)
+                errorExit(hstrerror(h_errno));
 
-  return *this;
+        return *this;
 }
 const string Dns::getHostName()const
 {
-  return h_name;
+        if(hostent_p)
+                return hostent_p->h_name;
+        else if(addrinfo_p)
+                return addrinfo_p->ai_canonname;
+        else 
+                errorExit("Can't use Dns::getHostName()");
+        return nullptr;
 }
 const int Dns::getAddrType()const
 {
-  return h_addrtype;
+        if(!hostent_p)
+                errorExit("Can't use Dns::getAddrType()");
+        return hostent_p->h_addrtype;
 }
 const vector<string> Dns::getAliases()const
 {
-  return h_aliases;
+        if(!hostent_p)
+                errorExit("Can't use Dns::getAliases()");
+        vector<string> h_aliases;
+        for(char** s=hostent_p->h_aliases;*s!=nullptr;++s){
+                h_aliases.push_back(*s);
+        }
+        return h_aliases;
 }
 const vector<string> Dns::getAddrList()const
 {
-  return h_addr_list;
+        if(!hostent_p)
+                errorExit("Can't use Dns::getAddrList()");
+        vector<string> h_addr_list;
+        for(char** s=hostent_p->h_addr_list;*s!=nullptr;++s){
+                h_addr_list.push_back(inet_ntoa(*(struct in_addr*)*s));
+        }
+
+        return h_addr_list;
 }
 void Dns::openTcp(void)
 {
-  sethostent(1);
-  // cout << "open" << endl;
+        sethostent(1);
 }
 void Dns::closeTcp(void)
 {
-  endhostent();
-  // cout << "closed" <<endl;
+        endhostent();
 }
 
-void Dns::hErrno()const
+AddrInfo Dns::getAddrInfo(const string& name, const int port)
 {
-  errorExit(hstrerror(h_errno));
-  /*
-  string wrong("DNS Parse Wrong: ");
-  switch(h_errno){
-  case HOST_NOT_FOUND:
-    wrong=wrong+h_name.c_str()+" is unknown. ";
-    errorExit(wrong);
-    break;
-  case NO_ADDRESS:
-    wrong=wrong+h_name.c_str()+" is valid, but does not have IP address. ";
-    errorExit(wrong);
-    break;
-  case NO_RECOVERY:
-    wrong=wrong+h_name.c_str()+" Nonrecoverable name server error occurred. ";
-    errorExit(wrong);
-    break;
-  case TRY_AGAIN:
-    wrong=wrong+h_name.c_str()+" Try Again later. ";
-    errorExit(wrong);
-    break;
-  default:
-    wrong=wrong+h_name.c_str()+" Unkown reasion";
-    errorExit(wrong);
-    break;
-  }
-  */
+        if(addrinfo_p!=NULL){
+                freeaddrinfo(addrinfo_p);
+        }
+        hostent_p=NULL;
+        
+        string port_str=to_string(port);
+        struct addrinfo hints;
+        struct addrinfo *result;
+
+        memset(&hints,0,sizeof(struct addrinfo));
+        hints.ai_family=AF_INET;       /* Allow IPv4 or IPv6 */
+        hints.ai_socktype=SOCK_STREAM;   /* Datagram socket */
+        hints.ai_protocol=IPPROTO_TCP;   /* TCP protocol */
+        hints.ai_flags= 0;               /* lookup IPv4 or IPv6 */
+
+        int s=getaddrinfo(name.data(),port_str.data(),&hints,&result);
+        if(s!=0){
+                fprintf(stdout,"getaddrinfo: %s\n",gai_strerror(s));
+                exit(EXIT_FAILURE);
+        }
+        addrinfo_p=result;
+        return addrinfo_p;
 }
 /**********************************************
  ************** DnsLocal **********************
  *******************************************/
 DnsLocal* DnsLocal::create()
 {
-  DnsLocal *p=new DnsLocal;
-  // cout << "dnslocal create" <<endl;
-  return p;
+        DnsLocal *p=new DnsLocal;
+        // cout << "dnslocal create" <<endl;
+        return p;
 }
 
 void DnsLocal::insert(const string& hostname,const string& ip4)
 {
-  hostname_ip4_hash.insert(make_pair(hostname,ip4));
+        hostname_ip4_hash.insert(make_pair(hostname,ip4));
 }
 
 const string DnsLocal::find(const string& hostname) const
 {
-  auto pos=hostname_ip4_hash.find(hostname);
-  if(pos==hostname_ip4_hash.end()){
-    return "";
-   
-  }else{
-    return pos->second;
+        auto pos=hostname_ip4_hash.find(hostname);
+        if(pos==hostname_ip4_hash.end()){
+                return "";
+        }else{
+                return pos->second;
   }
 }
 

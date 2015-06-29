@@ -56,8 +56,9 @@ HttpRequest::HttpRequest(const HttpConnect& conn):HttpConnect(conn)
 		reqhead.push_back(host);
 	}
 }
-HttpRequest::HttpRequest(const HttpConnect& conn, \
-			const string& path):HttpConnect(conn),reqPath(path)
+HttpRequest::HttpRequest(const HttpConnect& conn,\
+                         const string& path\
+        ):HttpConnect(conn),reqPath(path)
 {
 	/** Three-way connect with the web server **/
 	handshake();	
@@ -68,8 +69,9 @@ HttpRequest::HttpRequest(const HttpConnect& conn, \
 	}
 }
 HttpRequest::HttpRequest(const HttpConnect& conn,\
-			const string& path,const vector<string>& reqhead \
-			):HttpConnect(conn),reqPath(path),reqhead(reqhead)
+                         const string& path,\
+                         const vector<string>& reqhead   
+        ):HttpConnect(conn),reqPath(path),reqhead(reqhead)
 {
 	handshake();	
 	version="HTTP/1.1";

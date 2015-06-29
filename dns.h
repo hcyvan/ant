@@ -4,38 +4,42 @@
 using namespace std;
 
 class Dns{
- public:
-  // Connect with name server use TCP socket. The
-  // default is UDP.
-  static void openTcp(void);
-  // Colse the TCP socket.
-  static void closeTcp(void);
-  // Get the host address and other information
-  // from the name server.
-  Dns& getHostByName(const string&);
-  const string getHostName(void)const;
-  const int getAddrType(void)const;
-  const vector<string> getAliases(void)const;
-  const vector<string> getAddrList(void)const; 
- private:
-  void hErrno(void)const;
+public:
+        Dns():hostent_p(nullptr),addrinfo_p(nullptr){}
+        ~Dns(){if(addrinfo_p){freeaddrinfo(addrinfo_p);\
+                        addrinfo_p=nullptr;}}
+        // Get the host address and other information
+        // from the name server.
+        Dns& getHostByName(const string&);
+        // Get address information from the name server.
+        AddrInfo getAddrInfo(const string&, const int port=80);
 
-  struct hostent* hostent_p;
-  string h_name;             // official name of host
-  vector<string> h_aliases;  // alias list
-  int h_addrtype;            // AF_INET/AF_INET6 
-  // int h_length;           // length of address
-  vector<string> h_addr_list;// list of addresses
-  
+        // Connect with name server use TCP socket. The
+        // default is UDP.
+        static void openTcp(void);
+        // Colse the TCP socket.
+        static void closeTcp(void);
+        // official name of host
+        const string getHostName(void)const;
+        // host address type
+        const int getAddrType(void)const;
+        // alias list
+        const vector<string> getAliases(void)const;
+        // list of addresses
+        const vector<string> getAddrList(void)const;
+
+private:
+        struct hostent* hostent_p;
+        AddrInfo addrinfo_p;
 };
 
 class DnsLocal{
- public:
-  static DnsLocal* create(void);
-  void insert(const string&,const string&);
-  const string find(const string&) const;
- private:
-  unordered_map<string,string> hostname_ip4_hash;
+public:
+        static DnsLocal* create(void);
+        void insert(const string&,const string&);
+        const string find(const string&) const;
+private:
+        unordered_map<string,string> hostname_ip4_hash;
 };
 
 #endif
