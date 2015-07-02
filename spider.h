@@ -5,11 +5,15 @@
 #include "http.h"
 #include "dns.h"
 using namespace std;
+
 class Spider{
 public:
-	static string get(const string&);
+        Spider();
+        // destructor to destruct the local nds
+        // ++++++++++++++++++++++++++++++++++
+        string get(const string &);
 private:
+        const string url;
 };
-
 
 #endif

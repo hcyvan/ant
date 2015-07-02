@@ -20,6 +20,10 @@
 #include <unistd.h>
 #include <netdb.h>
 using namespace std;
+
+typedef struct addrinfo* AddrInfo;
+typedef struct sockaddr* SockAddr;
+
 // the function prototype decleared in <string.h>
 //extern char* strdup(char*);
 // if malloc() return NULL, call exit().

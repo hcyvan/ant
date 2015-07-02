@@ -23,17 +23,16 @@ private:
 /******************************************************
  ****************** HttpRequest ***********************
  ****************************************************/
-class HttpRequest:private HttpConnect{
+class HttpRequest{
 public:
-	HttpRequest(const HttpConnect&);
-	HttpRequest(const HttpConnect&,const string&);
-	HttpRequest(const HttpConnect&,const string&,const vector<string>&);
+	HttpRequest(const int,const string&,const vector<string>&);
 	// GET (http request)
 protected:
 	int get();
 	// HEAD (http request)
 	int head();
 private:
+        int fd;
 	// Http request line;
 	string reqPath;
 	string version;
@@ -67,9 +66,9 @@ private:
 
 
 /******************************************************
- ************* HttpResponeContent ***********************
+ ************* HttpRespContent ***********************
  ****************************************************/
-class HttpRespContent:public HttpRequest{
+class HttpRespContent:public HttpRequest{ 
 public:
 	HttpRespContent(const HttpRequest&);
 	/** Return the reference of respcontent **/
