@@ -30,6 +30,7 @@ This module has two class.
 
 ### Spider
 This is a module use integrate the other modules to build a web spider. A "local dns server",*__loca_dns* is defined in this module. It is a global pointer to a *DnsLocal* object. When *Spider* get hostname from a *HttpUrl* object, it check the hostname in the "local dns server". If the hostname is in the local tablee, *Spider* won't use *Dns* object to get the remote server ip.
+
 ---
 ## Usage
 you can change the code in main.cc to do want you want.
