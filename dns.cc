@@ -100,7 +100,21 @@ void DnsLocal::insert(const string& hostname,const string& ip4)
 {
         hostname_ip4_hash.insert(make_pair(hostname,ip4));
 }
-
+void DnsLocal::insert(const string& hostname,const AddrInfo ai)
+{
+        for(AddrInfo rp=ai;rp!=nullptr;rp=rp->ai_next){
+                if(rp->ai_family==AF_INET){
+                        struct sockaddr_in* p;
+                        p=(struct sockaddr_in *)rp->ai_addr;
+                        char ip4buf[INET_ADDRSTRLEN];
+                        inet_ntop(AF_INET,&p->sin_addr,\
+                                  ip4buf,INET_ADDRSTRLEN);
+                        const string ip4=ip4buf;
+                        hostname_ip4_hash.insert(make_pair(\
+                                                   hostname,ip4));
+                }
+        }
+}
 const string DnsLocal::find(const string& hostname) const
 {
         auto pos=hostname_ip4_hash.find(hostname);
@@ -108,6 +122,6 @@ const string DnsLocal::find(const string& hostname) const
                 return "";
         }else{
                 return pos->second;
-  }
+        }
 }
 

@@ -37,6 +37,7 @@ class DnsLocal{
 public:
         static DnsLocal* create(void);
         void insert(const string&,const string&);
+        void insert(const string&,const AddrInfo);
         const string find(const string&) const;
 private:
         unordered_map<string,string> hostname_ip4_hash;

@@ -11,25 +11,34 @@ Spider::Spider()
 
 string Spider::get(const string& url)
 {
+        Dns dns;
+        HttpConnect skt;         
+        AddrInfo ai;
+        
         // HttpUrl
         HttpUrl url_parser(url);
-        // Dns
         string ip4=__local_dns->find(url_parser.getHostName());
         if(ip4==""){
-                // cout << "use remote dns ..." <<endl;
-                Dns dns;
+                
+                ai=dns.getAddrInfo(\
+                   url_parser.getHostName(),url_parser.getPort());
+                skt.set(ai);
+                __local_dns->insert(url_parser.getHostName(),ai);
+                /*
                 ip4=dns.getHostByName(url_parser.getHostName())\
                         .getAddrList()[0];
+                skt.set(ip4,url_parser.getPort());
                 __local_dns->insert(url_parser.getHostName(),ip4);
+                */
+        }else{
+                skt.set(ip4,url_parser.getPort());
         }
-        // HttpConnect
-        HttpConnect skt(ip4,url_parser.getPort())
-                ;
+        
         // HttpRequest
         vector<string> reqhead;
         reqhead.push_back("HOST: "+url_parser.getHostName());
   
-        HttpRequest req(skt,url_parser.getPath(),reqhead);
+        HttpRequest req(skt.handshake().getFd(),url_parser.getPath(),reqhead);
         // HttpRespContent
         HttpRespContent resp(req);
         return resp.data();

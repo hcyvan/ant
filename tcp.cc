@@ -1,34 +1,40 @@
 #include "tcp.h"
 #include "lib.h"
 
-HttpConnect::HttpConnect(const string ip, int objport)\
-        :ip4(ip),port(objport),addrinfo_p(nullptr)
+HttpConnect& HttpConnect::set(const string& ip, int objport)
 {
+        ip4=ip;
+        port=objport;
+        addrinfo_p=nullptr;
 	fd=socket(AF_INET, SOCK_STREAM, 0); 
 	if(fd==-1){
 		char buf[]="Can't return valuable socket";
 		errorExit(buf);
 	}
+        return *this;
 }
-HttpConnect::HttpConnect(const AddrInfo addrinfo)\
-        :ip4(""),port(-1),addrinfo_p(addrinfo)
+HttpConnect& HttpConnect::set(const AddrInfo addrinfo)
 {
+        ip4="";
+        port=-1;
+        addrinfo_p=addrinfo;
         fd=socket(AF_INET, SOCK_STREAM, 0); 
 	if(fd==-1){
 		char buf[]="Can't return valuable socket";
 		errorExit(buf);
 	}
+        return *this;
 }
         
 HttpConnect::~HttpConnect()
 {
 	close(fd);
 }
-void HttpConnect::handshake()
+HttpConnect& HttpConnect::handshake()
 {
 	// configure the sockaddr
  	struct sockaddr_in address;
-        if(ip4!=""){
+        if(addrinfo_p==nullptr){
                 memset((void*)&address, 0, sizeof(address));
                 address.sin_family=AF_INET;
                 const char* c_ip4=ip4.c_str();
@@ -45,7 +51,7 @@ void HttpConnect::handshake()
                 }
         }else{
                 int ret=connect(fd,addrinfo_p->ai_addr,         \
-                                sizeof(addrinfo_p->ai_addr));
+                                sizeof(*addrinfo_p->ai_addr));
                 if(ret==-1){
                         char buf[30];
                         sprintf(buf,"Connect Wrong!: errno:%d", \
@@ -53,20 +59,22 @@ void HttpConnect::handshake()
                         errorExit(buf);
                 }
         }
+        return *this;
 }
-int HttpConnect::getfd()
+int HttpConnect::getFd()
 {
 	return fd;
 }
-const string& HttpConnect::getip4()
+const string& HttpConnect::getIp4()
 {
 	return ip4;
 }
-void HttpConnect::setTimeout(int sec,int usec)
+HttpConnect& HttpConnect::setTimeout(int sec,int usec)
 {
 	timeout.tv_sec=sec;
 	timeout.tv_usec=usec;	
 	socklen_t len=sizeof(timeout);
 	setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &timeout, len);
+        return *this;
 }
 

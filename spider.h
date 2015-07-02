@@ -6,16 +6,14 @@
 #include "dns.h"
 using namespace std;
 
-
 class Spider{
 public:
-  Spider();
-  string get(const string &);
+        Spider();
+        // destructor to destruct the local nds
+        // ++++++++++++++++++++++++++++++++++
+        string get(const string &);
 private:
-
-  const string url;
-	
+        const string url;
 };
-
 
 #endif

@@ -32,12 +32,10 @@ const string& HttpUrl::getHostName()const
 {
 	return host_name;
 }
-
 int  HttpUrl::getPort()const
 {
 	return port;
 }
-
 const string& HttpUrl::getPath()const
 {
 	return path;
@@ -45,35 +43,10 @@ const string& HttpUrl::getPath()const
 /******************************************************
  ****************** HttpRequest ***********************
  ****************************************************/
-HttpRequest::HttpRequest(const HttpConnect& conn):HttpConnect(conn)
+HttpRequest::HttpRequest(const int fd,const string& path,       \
+                         const vector<string>& reqhead          \
+        ):fd(fd),reqPath(path),reqhead(reqhead)
 {
-	/** Three-way connect with the web server **/
-	handshake();	
-	reqPath="/index.html";
-	version="HTTP/1.1";
-	if(reqhead.empty()){
-		string host="HOST:"+ getip4();
-		reqhead.push_back(host);
-	}
-}
-HttpRequest::HttpRequest(const HttpConnect& conn,\
-                         const string& path\
-        ):HttpConnect(conn),reqPath(path)
-{
-	/** Three-way connect with the web server **/
-	handshake();	
-	version="HTTP/1.1";
-	if(reqhead.empty()){
-		string host="HOST:"+ getip4();
-		reqhead.push_back(host);
-	}
-}
-HttpRequest::HttpRequest(const HttpConnect& conn,\
-                         const string& path,\
-                         const vector<string>& reqhead   
-        ):HttpConnect(conn),reqPath(path),reqhead(reqhead)
-{
-	handshake();	
 	version="HTTP/1.1";
 }
 int HttpRequest::get()
@@ -86,11 +59,7 @@ int HttpRequest::get()
 	}
 	// request data
 	get=get+"\n"+reqdata;
-
-	const char* req=get.c_str();
-	int fd=getfd();
-
-	send(fd, req, strlen(req), 0);
+	send(fd, get.data(), get.length(), 0);
 	return fd;
 }
 int HttpRequest::head()
@@ -103,11 +72,7 @@ int HttpRequest::head()
 	}
 	// request data
 	get=get+"\n"+reqdata;
-
-	const char* req=get.c_str();
-	int fd=getfd();
-
-	send(fd, req, strlen(req), 0);
+	send(fd, get.data(), get.length(), 0);
 	return fd;
 }
 
