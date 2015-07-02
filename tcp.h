@@ -34,6 +34,8 @@ private:
 	struct timeval timeout;
         
         AddrInfo addrinfo_p;
+
+        vector<int> fd_to_close;
 };
 
 

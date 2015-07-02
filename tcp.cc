@@ -11,6 +11,7 @@ HttpConnect& HttpConnect::set(const string& ip, int objport)
 		char buf[]="Can't return valuable socket";
 		errorExit(buf);
 	}
+        fd_to_close.push_back(fd);
         return *this;
 }
 HttpConnect& HttpConnect::set(const AddrInfo addrinfo)
@@ -23,12 +24,14 @@ HttpConnect& HttpConnect::set(const AddrInfo addrinfo)
 		char buf[]="Can't return valuable socket";
 		errorExit(buf);
 	}
+        fd_to_close.push_back(fd);
         return *this;
 }
         
 HttpConnect::~HttpConnect()
 {
-	close(fd);
+	for(int i:fd_to_close)
+                close(i);
 }
 HttpConnect& HttpConnect::handshake()
 {

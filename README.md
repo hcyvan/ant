@@ -1,13 +1,12 @@
 ## Crawler
-This is a suite of APIs for web spider. These APIs are wirte by C++11 and use the linux socket APIs for the lower layer. The version 0.1 is relased. 0.1 means it is not stable and maybe contain a lot of bugs. When 1.0 is released, the APIs is OK to use. There are several modules in the APIs.  
+This is a suite of APIs for web spider. These APIs are wirte by C++11 and use the linux socket APIs for the lower layer. The version 0.2 is relased. 0.2 means it is not stable and maybe contain a lot of bugs. When 1.0 is released, the APIs is OK to use. There are several modules in the APIs.  
 For more information, read the manual.md in chinese.
 ---
 ## Brief
 There are five moudle's in the API suite.
 ### tcp
 + **HttpConnect**: This class is used to connect with the (web) server.
-  + *HttpConnet(const string& ip, int objport=80)*: Constructor.
-  + *HttpConnet(const HttpConnect&)*: Copy constructor.
+  + *set()*: set the object remote host.
   + *handshack()*: member func to do the three-way handshake with remote host.
   + *getfd()*: return the socket fd of local cleint.
   + *getip4()*: return the ip of remote host.
@@ -31,3 +30,9 @@ This module has two class.
 
 ### Spider
 This is a module use integrate the other modules to build a web spider. A "local dns server",*__loca_dns* is defined in this module. It is a global pointer to a *DnsLocal* object. When *Spider* get hostname from a *HttpUrl* object, it check the hostname in the "local dns server". If the hostname is in the local tablee, *Spider* won't use *Dns* object to get the remote server ip.
+---
+## Usage
+you can change the code in main.cc to do want you want.
+
++ **make** complie all the *.c* file in the file and link them
++ **make clean** clean *.o* file and the *crawler* 
